@@ -1,0 +1,8 @@
+<h1>Protected Home Page</h1>
+
+<p>Welcome, {{ request.user.username }}!</p>
+
+<form method="POST" action="{% url 'logout' %}">
+  {% csrf_token %}
+  <button type="submit">Logout</button>
+</form>
