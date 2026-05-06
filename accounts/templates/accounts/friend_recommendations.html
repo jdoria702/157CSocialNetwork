@@ -1,0 +1,28 @@
+<h1>Recommended Users</h1>
+
+{% for user in recommended_users %}
+  <div>
+    <p>
+      <strong>{{ user.username }}</strong><br>
+      {{ user.first_name }} {{ user.last_name }}<br>
+
+      {% if user.bio %}
+        {{ user.bio }}
+      {% endif %}
+    </p>
+
+    <!-- When form submitted, path("follow/<int:user_id>/", views.follow_user_view, name="follow_user") is taken -->
+    <form method="POST" action="{% url 'follow_user' user.django_id %}">
+      {% csrf_token %}
+      <button type="submit">Follow</button>
+    </form>
+  </div>
+
+  <hr>
+{% empty %}
+  <p>No recommendations at this time.</p>
+{% endfor %}
+
+<a href="{% url 'home' %}">
+  <button>Back Home</button>
+</a>

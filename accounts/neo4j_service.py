@@ -69,3 +69,111 @@ def update_user_node(user, bio=""):
 
     print(f"No Neo4j node found for user: {user.username}, in {summary.result_available_after} ms.")
     return None
+
+def get_all_users_except_current(current_user_id):
+    query = """
+    MATCH (u:User)
+    WHERE u.django_id <> $current_user_id
+    RETURN u
+    """
+
+    records, summary, keys = driver.execute_query(
+        query,
+        current_user_id=current_user_id
+    )
+
+    print(f"Retrieved all users except current user ID: {current_user_id}, in {summary.result_available_after} ms.")
+    return [record["u"] for record in records]
+    
+def follow_user(current_user_id, target_user_id):
+    query = """
+    MATCH (follower:User {django_id: $current_user_id})
+    MATCH (followee:User {django_id: $target_user_id})
+    MERGE (follower)-[:FOLLOWS]->(followee)
+    """
+
+    summary = driver.execute_query(
+        query,
+        current_user_id=current_user_id,
+        target_user_id=target_user_id
+    ).summary
+
+    print(f"User ID {current_user_id} followed user ID {target_user_id}, in {summary.result_available_after} ms."
+          
+)
+    
+def unfollow_user(current_user_id, target_user_id):
+    query = """
+    MATCH (follower:User {django_id: $current_user_id})-[r:FOLLOWS]->(followee:User {django_id: $target_user_id})
+    DELETE r
+    """
+
+    summary = driver.execute_query(
+        query,
+        current_user_id=current_user_id,
+        target_user_id=target_user_id
+    ).summary
+
+    print(f"User ID {current_user_id} unfollowed user ID {target_user_id}, in {summary.result_available_after} ms.")
+
+def get_following(current_user_id):
+    query = """
+    MATCH (follower:User {django_id: $current_user_id})-[:FOLLOWS]->(followee:User)
+    RETURN followee
+    """
+
+    records, summary, keys = driver.execute_query(
+        query,
+        current_user_id=current_user_id
+    )
+
+    print(f"Retrieved following list for user ID: {current_user_id}, in {summary.result_available_after} ms.")
+    return [record["followee"] for record in records]
+
+def get_followers(current_user_id):
+    query = """
+    MATCH (follower:User)-[:FOLLOWS]->(followee:User {django_id: $current_user_id})
+    RETURN follower
+    """
+
+    records, summary, keys = driver.execute_query(
+        query,
+        current_user_id=current_user_id
+    )
+
+    print(f"Retrieved followers list for user ID: {current_user_id}, in {summary.result_available_after} ms.")
+    return [record["follower"] for record in records]
+
+def get_mutual_followers(current_user_id, other_user_id):
+    query = """
+    MATCH (u1:User {django_id: $current_user_id})-[:FOLLOWS]->(mutual:User)<-[:FOLLOWS]-(u2:User {django_id: $other_user_id})
+    RETURN mutual
+    """
+
+    records, summary, keys = driver.execute_query(
+        query,
+        current_user_id=current_user_id,
+        other_user_id=other_user_id
+    )
+
+    print(f"Retrieved mutual followers between user ID {current_user_id} and user ID {other_user_id}, in {summary.result_available_after} ms.")
+    return [record["mutual"] for record in records]
+
+def get_friend_recommendations(current_user_id, limit=5):
+    query = """
+    MATCH (u:User {django_id: $current_user_id})-[:FOLLOWS]->(f:User)-[:FOLLOWS]->(rec:User)
+    WHERE NOT (u)-[:FOLLOWS]->(rec) AND u.django_id <> rec.django_id
+    RETURN rec, COUNT(*) AS mutual_followers
+    ORDER BY mutual_followers DESC
+    LIMIT $limit
+    """
+
+    records, summary, keys = driver.execute_query(
+        query,
+        current_user_id=current_user_id,
+        limit=limit
+    )
+
+    print(f"Retrieved friend recommendations for user ID: {current_user_id}, in {summary.result_available_after} ms.")
+    return [record["rec"] for record in records]
+

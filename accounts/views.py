@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from .forms import CustomUserCreationForm
 from .neo4j_service import create_user_node
 from .forms import EditProfileForm
-from .neo4j_service import get_user_node, update_user_node
+from .neo4j_service import get_user_node, update_user_node, get_all_users_except_current, follow_user, unfollow_user, get_following, get_followers, get_mutual_followers, get_friend_recommendations
 
 def signup_view(request):
     # Handle form submission
@@ -70,3 +70,51 @@ def edit_profile_view(request):
         })
 
     return render(request, "accounts/edit_profile.html", {"form": form})
+
+@login_required
+def discover_users_view(request):
+    users = get_all_users_except_current(request.user.id)
+
+    return render(request, "accounts/discover_users.html", {"users": users})
+
+@login_required
+def follow_user_view(request, user_id):
+    if request.method == "POST":
+        follow_user(request.user.id, user_id)
+
+    return redirect("discover_users")
+
+@login_required
+def following_view(request):
+    following = get_following(request.user.id)
+
+    return render(request, "accounts/following.html", {"following": following})
+
+@login_required
+def followers_view(request):
+    followers = get_followers(request.user.id)
+
+    return render(request, "accounts/followers.html", {"followers": followers})
+
+@login_required
+def mutual_followers_view(request, other_user_id):
+    mutual_followers = get_mutual_followers(request.user.id, other_user_id)
+    other_user = get_user_node(other_user_id)
+
+    return render(request, "accounts/mutual_followers.html", {
+        "mutual_followers": mutual_followers,
+        "other_user": other_user
+    })
+
+@login_required
+def friend_recommendations_view(request):
+    recommended_users = get_friend_recommendations(request.user.id)
+
+    return render(request, "accounts/friend_recommendations.html", {"recommended_users": recommended_users})
+
+@login_required
+def unfollow_user_view(request, user_id):
+    if request.method == "POST":
+        unfollow_user(request.user.id, user_id)
+
+    return redirect("following")
