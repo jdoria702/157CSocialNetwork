@@ -170,12 +170,9 @@ social-network/
 
 ## 🧪 Future Improvements
 
-* Follow / Unfollow users (`FOLLOWS` relationship)
-* View followers and following lists
-* Mutual connections
 * Friend recommendation system (graph traversal)
-* User profile page with editable bio
 * Posts, likes, and comments
+* UI Update
 
 ---
 
