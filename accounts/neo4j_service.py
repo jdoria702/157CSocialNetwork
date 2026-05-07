@@ -177,3 +177,35 @@ def get_friend_recommendations(current_user_id, limit=5):
     print(f"Retrieved friend recommendations for user ID: {current_user_id}, in {summary.result_available_after} ms.")
     return [record["rec"] for record in records]
 
+def search_users(query, current_user_id):
+    cypher = """
+    MATCH (u:User)
+    WHERE u.django_id <> $current_user_id
+      AND (
+        toLower(u.username) CONTAINS toLower($query)
+        OR toLower(u.first_name) CONTAINS toLower($query)
+        OR toLower(u.last_name) CONTAINS toLower($query)
+      )
+    RETURN u
+    LIMIT 20
+    """
+
+    records, summary, keys = driver.execute_query(
+        cypher,
+        query=query,
+        current_user_id=current_user_id
+    )
+
+    users = []
+
+    for record in records:
+        node = record["u"]
+        users.append({
+            "django_id": node["django_id"],
+            "username": node.get("username", ""),
+            "first_name": node.get("first_name", ""),
+            "last_name": node.get("last_name", ""),
+            "bio": node.get("bio", "")
+        })
+
+    return users

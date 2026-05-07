@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from .forms import CustomUserCreationForm
-from .neo4j_service import create_user_node
+from .neo4j_service import create_user_node, search_users
 from .forms import EditProfileForm
 from .neo4j_service import get_user_node, update_user_node, get_all_users_except_current, follow_user, unfollow_user, get_following, get_followers, get_mutual_followers, get_friend_recommendations
 
@@ -118,3 +118,17 @@ def unfollow_user_view(request, user_id):
         unfollow_user(request.user.id, user_id)
 
     return redirect("following")
+
+@login_required
+def search_users_view(request):
+    query = request.GET.get("q", "").strip()
+
+    results = []
+
+    if query:
+        results = search_users(query, request.user.id)
+
+    return render(request, "accounts/search_users.html", {
+        "query": query,
+        "results": results
+    })
