@@ -209,3 +209,29 @@ def search_users(query, current_user_id):
         })
 
     return users
+
+def get_popular_users(limit=5):
+    query = """
+    MATCH (u:User)<-[:FOLLOWS]-(follower:User)
+    RETURN u, COUNT(follower) AS followers_count
+    ORDER BY followers_count DESC
+    LIMIT $limit
+    """
+
+    records, summary, keys = driver.execute_query(
+        query,
+        limit=limit
+    )
+
+    print(f"Retrieved popular users, in {summary.result_available_after} ms.")
+    return [
+        {
+            "django_id": record["u"]["django_id"],
+            "username": record["u"].get("username", ""),
+            "first_name": record["u"].get("first_name", ""),
+            "last_name": record["u"].get("last_name", ""),
+            "bio": record["u"].get("bio", ""),
+            "followers_count": record["followers_count"]
+        }
+        for record in records
+    ]

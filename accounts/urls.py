@@ -15,4 +15,5 @@ urlpatterns = [
     path("unfollow/<int:user_id>/", views.unfollow_user_view, name="unfollow_user"),
     path("friend_recommendations/", views.friend_recommendations_view, name="friend_recommendations"),
     path("search_users/", views.search_users_view, name="search_users"),
+    path("popular_users/", views.popular_users_view, name="popular_users"),
 ]

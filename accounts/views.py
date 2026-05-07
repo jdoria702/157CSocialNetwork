@@ -2,9 +2,9 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from .forms import CustomUserCreationForm
-from .neo4j_service import create_user_node, search_users
+from .neo4j_service import create_user_node, get_popular_users, search_users
 from .forms import EditProfileForm
-from .neo4j_service import get_user_node, update_user_node, get_all_users_except_current, follow_user, unfollow_user, get_following, get_followers, get_mutual_followers, get_friend_recommendations
+from .neo4j_service import get_user_node, update_user_node, get_all_users_except_current, follow_user, unfollow_user, get_following, get_followers, get_mutual_followers, get_friend_recommendations, get_popular_users
 
 def signup_view(request):
     # Handle form submission
@@ -132,3 +132,8 @@ def search_users_view(request):
         "query": query,
         "results": results
     })
+
+@login_required
+def popular_users_view(request):
+    popular_users = get_popular_users(limit=10)
+    return render(request, "accounts/popular_users.html", {"popular_users": popular_users})

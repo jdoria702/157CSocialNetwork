@@ -1,0 +1,12 @@
+<h1>Explore Popular Users</h1>
+<ul>
+    {% for user in popular_users %}
+        <li>
+            <strong>{{ user.username }}</strong> - {{ user.followers_count }} followers
+        </li>
+    {% endfor %}
+</ul>
+
+<a href="{% url 'home' %}">
+    <button>Back to Home</button>
+</a>
