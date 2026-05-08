@@ -112,6 +112,238 @@ http://127.0.0.1:8000/
 
 ---
 
+## 📊 Populating the Neo4j Dataset
+
+This project supports importing a mock social graph dataset into Neo4j AuraDB for testing graph traversal features such as:
+
+* Followers / Following
+* Mutual connections
+* Friend recommendations
+* Popular users
+
+The dataset consists of:
+
+* `users.csv` → User nodes
+* `follows.csv` → `FOLLOWS` relationships
+
+---
+
+### 1. Generate Mock Users with Mockaroo
+
+Use:
+
+[Mockaroo](https://mockaroo.com/?utm_source=chatgpt.com)
+
+Create a dataset with the following fields:
+
+| Field Name | Type |
+|---|---|
+| django_id | Row Number |
+| first_name | First Name |
+| last_name | Last Name |
+| username | Username |
+| email | Email Address |
+| bio | Sentences |
+| password | Password |
+
+Important:
+
+* Set `django_id` to start at a high value such as `10001`
+* This prevents collisions with real Django users stored in SQLite
+
+Example:
+
+```csv
+django_id,first_name,last_name,username,email,bio,password
+10001,John,Smith,johnsmith,john@example.com,"CS student",password123
+10002,Amy,Chen,amychen,amy@example.com,"Coffee lover",password123
+```
+
+Download the file as:
+
+```text
+users.csv
+```
+
+---
+
+### 2. Generate Follow Relationships
+
+Create a Python file:
+
+```text
+generate_follows.py
+```
+
+Add:
+
+```python
+import csv
+import random
+
+START_ID = 10001
+NUM_USERS = 100
+NUM_FOLLOWS = 500
+
+user_ids = list(range(START_ID, START_ID + NUM_USERS))
+pairs = set()
+
+while len(pairs) < NUM_FOLLOWS:
+    follower_id = random.choice(user_ids)
+    following_id = random.choice(user_ids)
+
+    if follower_id != following_id:
+        pairs.add((follower_id, following_id))
+
+with open("follows.csv", "w", newline="") as f:
+    writer = csv.writer(f)
+    writer.writerow(["follower_id", "following_id"])
+    writer.writerows(pairs)
+
+print("Created follows.csv")
+```
+
+Run:
+
+```bash
+python generate_follows.py
+```
+
+This creates:
+
+```text
+follows.csv
+```
+
+---
+
+### 3. Import into Neo4j AuraDB
+
+Open:
+
+[Neo4j Data Importer](https://data-importer.neo4j.io/?utm_source=chatgpt.com)
+
+Upload:
+
+* `users.csv`
+* `follows.csv`
+
+---
+
+### 4. Configure Node Import
+
+Create a `User` node using:
+
+| Setting | Value |
+|---|---|
+| Label | User |
+| ID Field | django_id |
+
+Map the remaining fields as properties.
+
+---
+
+### 5. Configure Relationship Import
+
+Create a relationship:
+
+```text
+(:User)-[:FOLLOWS]->(:User)
+```
+
+Using:
+
+| Source Field | Target Field |
+|---|---|
+| follower_id | following_id |
+
+Relationship type:
+
+```text
+FOLLOWS
+```
+
+---
+
+### 6. Run the Import
+
+Click:
+
+```text
+Run Import
+```
+
+Neo4j AuraDB will create:
+
+* User nodes
+* Follow relationships
+
+---
+
+### 7. Verify Import
+
+Run the following Cypher queries in Neo4j Browser.
+
+Count users:
+
+```cypher
+MATCH (u:User)
+RETURN count(u);
+```
+
+Count follow relationships:
+
+```cypher
+MATCH ()-[r:FOLLOWS]->()
+RETURN count(r);
+```
+
+Visualize the graph:
+
+```cypher
+MATCH (u:User)-[:FOLLOWS]->(f)
+RETURN u, f
+LIMIT 50;
+```
+
+---
+
+### Example Graph Queries
+
+Most-followed users:
+
+```cypher
+MATCH (u:User)<-[:FOLLOWS]-(follower)
+RETURN u.username, count(follower) AS followers
+ORDER BY followers DESC
+LIMIT 10;
+```
+
+Users following the most people:
+
+```cypher
+MATCH (u:User)-[:FOLLOWS]->(following)
+RETURN u.username, count(following) AS following_count
+ORDER BY following_count DESC
+LIMIT 10;
+```
+
+Friend recommendations:
+
+```cypher
+MATCH (me:User {username: "johnsmith"})
+      -[:FOLLOWS]->(:User)-[:FOLLOWS]->(recommended)
+
+WHERE NOT (me)-[:FOLLOWS]->(recommended)
+AND me <> recommended
+
+RETURN recommended.username, count(*) AS score
+ORDER BY score DESC
+LIMIT 10;
+```
+
+---
+
 ## 🔐 Authentication Flow
 
 * Landing page (public)
