@@ -1,36 +1,10 @@
-<h1>Protected Home Page</h1>
-
-<p>Welcome, {{ request.user.username }}!</p>
+{% extends "accounts/base.html" %}
+{% block title %}Home{% endblock %}
+{% block content %}
+<h1>Welcome, {{ request.user.username }}!</h1>
 
 <form method="POST" action="{% url 'logout' %}">
   {% csrf_token %}
   <button type="submit">Logout</button>
 </form>
-
-<a href="{% url 'profile' %}">
-    <button>View Profile</button>
-</a>
-
-<a href="{% url 'discover_users' %}">
-  <button>Discover Users</button>
-</a>
-
-<a href="{% url 'following' %}">
-  <button>Following</button>
-</a>
-
-<a href="{% url 'followers' %}">
-  <button>Followers</button>
-</a>
-
-<a href="{% url 'friend_recommendations' %}">
-  <button>Friend Recommendations</button>
-</a>
-
-<a href="{% url 'search_users' %}">
-  <button>Search Users</button>
-</a>
-
-<a href="{% url 'popular_users' %}">
-  <button>Popular Users</button>
-</a>
+{% endblock %}

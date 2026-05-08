@@ -1,21 +1,20 @@
+{% extends "accounts/base.html" %}
+{% block title %}Profile{% endblock %}
+{% block content %}
 <h1>My Profile</h1>
-<p><strong>Name:</strong> {{ request.user.first_name }} {{ request.user.last_name }}</p>
-<p><strong>Username:</strong> {{ request.user.username }}</p>
-<p><strong>Email:</strong> {{ request.user.email }}</p>
-
-<p>
+<div class="card">
+  <p><strong>Name:</strong> {{ request.user.first_name }} {{ request.user.last_name }}</p>
+  <p><strong>Username:</strong> {{ request.user.username }}</p>
+  <p><strong>Email:</strong> {{ request.user.email }}</p>
+  <p>
     <strong>Bio:</strong>
     {% if neo4j_user.bio %}
-        {{ neo4j_user.bio }}
+      {{ neo4j_user.bio }}
     {% else %}
-        No bio available.
+      <span class="muted">No bio available.</span>
     {% endif %}
-</p>
+  </p>
+</div>
 
-<a href="{% url 'edit_profile' %}">
-    <button>Edit Profile</button>
-</a>
-
-<a href="{% url 'home' %}">
-    <button>Back to Home</button>
-</a>
+<a href="{% url 'edit_profile' %}"><button>Edit Profile</button></a>
+{% endblock %}

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}Social Network{% endblock %}</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 24px;
+      color: #222;
+      background: #f7f7f8;
+    }
+    h1 { margin-top: 0; }
+    h2 { margin-top: 24px; }
+    a { color: #2563eb; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    button {
+      background: #2563eb;
+      color: white;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      margin: 2px 4px 2px 0;
+    }
+    button:hover { background: #1d4ed8; }
+    nav {
+      background: white;
+      padding: 10px 16px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      border: 1px solid #e5e5e5;
+    }
+    nav a { margin-right: 14px; font-size: 14px; }
+    .card {
+      background: white;
+      border: 1px solid #e5e5e5;
+      border-radius: 6px;
+      padding: 12px 16px;
+      margin-bottom: 10px;
+    }
+    .card p { margin: 4px 0; }
+    hr { display: none; }
+    input[type="text"], input[type="email"], input[type="password"], textarea {
+      padding: 6px 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    .muted { color: #666; font-size: 13px; }
+  </style>
+</head>
+<body>
+  {% if request.user.is_authenticated %}
+    <nav>
+      <a href="{% url 'home' %}">Home</a>
+      <a href="{% url 'profile' %}">Profile</a>
+      <a href="{% url 'discover_users' %}">Discover</a>
+      <a href="{% url 'following' %}">Following</a>
+      <a href="{% url 'followers' %}">Followers</a>
+      <a href="{% url 'friend_recommendations' %}">Recommended</a>
+      <a href="{% url 'search_users' %}">Search</a>
+      <a href="{% url 'popular_users' %}">Popular</a>
+    </nav>
+  {% endif %}
+  {% block content %}{% endblock %}
+</body>
+</html>

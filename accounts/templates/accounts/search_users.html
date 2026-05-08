@@ -1,29 +1,22 @@
+{% extends "accounts/base.html" %}
+{% block title %}Search{% endblock %}
+{% block content %}
 <h1>Search Users</h1>
 
 <form method="GET" action="{% url 'search_users' %}">
-  <input 
-    type="text" 
-    name="q" 
-    placeholder="Search by name or username"
-    value="{{ query }}"
-  >
+  <input type="text" name="q" placeholder="Search by name or username" value="{{ query }}">
   <button type="submit">Search</button>
 </form>
-
-<hr>
 
 {% if query %}
   <h2>Results for "{{ query }}"</h2>
 
   {% for user in results %}
-    <div>
+    <div class="card">
       <p>
         <strong>{{ user.username }}</strong><br>
-        {{ user.first_name }} {{ user.last_name }}<br>
-
-        {% if user.bio %}
-          {{ user.bio }}
-        {% endif %}
+        {{ user.first_name }} {{ user.last_name }}
+        {% if user.bio %}<br><span class="muted">{{ user.bio }}</span>{% endif %}
       </p>
 
       <form method="POST" action="{% url 'follow_user' user.django_id %}">
@@ -31,13 +24,8 @@
         <button type="submit">Follow</button>
       </form>
     </div>
-
-    <hr>
   {% empty %}
     <p>No users found.</p>
   {% endfor %}
 {% endif %}
-
-<a href="{% url 'home' %}">
-  <button>Back Home</button>
-</a>
+{% endblock %}

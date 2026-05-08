@@ -23,6 +23,9 @@ staticfiles/
 # Mac
 .DS_Store
 
+# Imported datasets
+data/
+
 # Migrations (optional — see note below)
 # */migrations/*.py
 # !*/migrations/__init__.py
