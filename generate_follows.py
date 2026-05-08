@@ -3,8 +3,7 @@ import random
 
 START_ID = 10001
 END_ID = 11000
-NUM_USERS = 100
-NUM_FOLLOWS = 500
+NUM_FOLLOWS = 5000
 
 user_ids = list(range(START_ID, END_ID))
 pairs = set()
