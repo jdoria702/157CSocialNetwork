@@ -1,30 +1,21 @@
+{% extends "accounts/base.html" %}
+{% block title %}Mutual Followers{% endblock %}
+{% block content %}
 <h1>Mutual Followers</h1>
 
 {% if other_user %}
-  <div>
-    <h2>Mutual followers with {{ other_user.username }}</h2>
-    <p>{{ other_user.first_name }} {{ other_user.last_name }}</p>
-  </div>
-  <hr>
+  <p class="muted">With {{ other_user.username }} ({{ other_user.first_name }} {{ other_user.last_name }})</p>
 {% endif %}
 
 {% for user in mutual_followers %}
-  <div>
+  <div class="card">
     <p>
       <strong>{{ user.username }}</strong><br>
-      {{ user.first_name }} {{ user.last_name }}<br>
-
-      {% if user.bio %}
-        {{ user.bio }}
-      {% endif %}
+      {{ user.first_name }} {{ user.last_name }}
+      {% if user.bio %}<br><span class="muted">{{ user.bio }}</span>{% endif %}
     </p>
   </div>
-
-  <hr>
 {% empty %}
   <p>No mutual followers yet.</p>
 {% endfor %}
-
-<a href="{% url 'home' %}">
-  <button>Back Home</button>
-</a>
+{% endblock %}

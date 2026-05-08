@@ -10,7 +10,7 @@ with GraphDatabase.driver(
 
 def create_user_node(user, bio=""):
     query = """
-    MERGE (u:User {django_id: $django_id})
+    CREATE (u:User {django_id: $django_id})
     SET u.username = $username,
         u.email = $email,
         u.first_name = $first_name,

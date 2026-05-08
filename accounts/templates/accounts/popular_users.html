@@ -1,12 +1,16 @@
-<h1>Explore Popular Users</h1>
-<ul>
-    {% for user in popular_users %}
-        <li>
-            <strong>{{ user.username }}</strong> - {{ user.followers_count }} followers
-        </li>
-    {% endfor %}
-</ul>
+{% extends "accounts/base.html" %}
+{% block title %}Popular Users{% endblock %}
+{% block content %}
+<h1>Popular Users</h1>
 
-<a href="{% url 'home' %}">
-    <button>Back to Home</button>
-</a>
+{% for user in popular_users %}
+  <div class="card">
+    <p>
+      <strong>{{ user.username }}</strong><br>
+      <span class="muted">{{ user.followers_count }} followers</span>
+    </p>
+  </div>
+{% empty %}
+  <p>No users yet.</p>
+{% endfor %}
+{% endblock %}
